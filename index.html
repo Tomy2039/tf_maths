@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Suma y Multiplicación de Matrices con TensorFlow.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.14.0/dist/tf.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        label {
+            margin: 10px;
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-color: #007bff;
+            border-radius: 5px;
+        }
+        button {
+            margin: 15px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #matrices, #resultado {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .matriz {
+            display: inline-block;
+            margin: 20px;
+        }
+
+        .fila {
+            display: flex;
+            justify-content: center;
+        }
+        .celda {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            margin: 3px;
+            background-color: #e0e0e0;
+            border: 2px solid #999;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+</style>
+
+</head>
+<body>
+    <h1>Operaciones con Matrices (TF.js)</h1>
+    <label>Filas: <input type="number" id="filas"></label>
+    <label>Columnas: <input type="number" id="columnas"></label>
+    <button onclick="generarMatrices()">Generar Matrices</button>
+    <div id="matrices" class="matriz"></div>
+    <button onclick="sumarMatrices()">Sumar Matrices</button>
+    <button onclick="multiplicarMatrices()">Multiplicar Matrices</button>
+    
+    <h2>Resultado</h2>
+    <div id="resultado"></div>
+
+    <script>
+        let matriz1 = null;
+        let matriz2 = null;
+
+        function generarMatrices() {
+            const filas = parseInt(document.getElementById("filas").value);
+            const columnas = parseInt(document.getElementById("columnas").value);
+            const contenedor = document.getElementById("matrices");
+            const resultado = document.getElementById("resultado");
+            resultado.innerHTML = "";
+
+            if (isNaN(filas) || isNaN(columnas) || filas <= 0 || columnas <= 0) {
+                alert("Ingrese dimensiones válidas.");
+                return;
+            }
+
+            // Generar matrices aleatorias con TF.js
+            matriz1 = tf.randomUniform([filas, columnas], 1, 21, 'int32');
+            matriz2 = tf.randomUniform([filas, columnas], 1, 21, 'int32');
+
+            // Mostrar matrices
+            contenedor.innerHTML = "<h3>Matriz 1</h3>" + matrizToHTML(matriz1.arraySync());
+            contenedor.innerHTML += "<h3>Matriz 2</h3>" + matrizToHTML(matriz2.arraySync());
+        }
+
+        function matrizToHTML(matriz) {
+            let html = "";
+            for (let fila of matriz) {
+                html += `<div class="fila">`;
+                for (let valor of fila) {
+                    html += `<div class="celda">${valor}</div>`;
+                }
+                html += `</div>`;
+            }
+            return html;
+        }
+
+
+        function mostrarResultado(matriz) {
+            const contenedor = document.getElementById("resultado");
+            contenedor.innerHTML = matrizToHTML(matriz.arraySync());
+        }
+
+        function sumarMatrices() {
+            if (!matriz1 || !matriz2) {
+                alert("Genera primero las matrices.");
+                return;
+            }
+            const resultado = tf.add(matriz1, matriz2);
+            mostrarResultado(resultado);
+        }
+
+        function multiplicarMatrices() {
+            if (!matriz1 || !matriz2) {
+                alert("Genera primero las matrices.");
+                return;
+            }
+            const resultado = tf.matMul(matriz1, matriz2.transpose());
+            mostrarResultado(resultado);
+        }
+    </script>
+</body>
+</html>
